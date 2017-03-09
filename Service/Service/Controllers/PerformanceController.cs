@@ -26,7 +26,8 @@ namespace Performance.Rest.Controllers
                                 ContractResolver = new CamelCasePropertyNamesContractResolver(),
                                 DateTimeZoneHandling = DateTimeZoneHandling.RoundtripKind,
                                 DateFormatHandling = DateFormatHandling.IsoDateFormat,
-                                DateParseHandling = DateParseHandling.None
+                                DateParseHandling = DateParseHandling.None,
+                                StringEscapeHandling = StringEscapeHandling.EscapeHtml
                             });
             
             return response;
@@ -41,67 +42,55 @@ namespace Performance.Rest.Controllers
             response.Url = request.Url;
             response.Repetition = request.Repetition;
 
-            response.ResponseTimesAmericas = new List<int>();
-            response.ResponseTimesEurope = new List<int>();
-            response.ResponseTimesAsia = new List<int>();
+            response.ResponseTimes = new List<int>();
 
             for (int rep = 0; rep < request.Repetition; rep++)
             {
-                response.ResponseTimesAmericas.Add(this.GetResponseTimes(request.Url));
-                response.ResponseTimesEurope.Add(this.GetResponseTimes(request.Url));
-                response.ResponseTimesAsia.Add(this.GetResponseTimes(request.Url));
+                response.ResponseTimes.Add(this.GetResponseTimes(request.Url));                
             }
 
-            response.ResponseTimeAverage = this.GetAverageTimes(response);
+            response.ResponseTimeAverage = response.ResponseTimes.Average();
 
             return response;
         }
 
         private int GetResponseTimes(string url)
         {
-            return new Random().Next() * 10;
+            var pingSender = new Ping();
+            
+            // Create a buffer of 32 bytes of data to be transmitted.
+            string data = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+            byte[] buffer = Encoding.ASCII.GetBytes(data);
 
-            //var pingSender = new Ping();
+            // Set options for transmission:
+            // The data can go through 64 gateways or routers
+            // before it is destroyed, and the data packet
+            // cannot be fragmented.
+            PingOptions options = new PingOptions(64, true);
+            
+            int response = 0;
 
-            ////pingSender.PingCompleted += PingSender_PingCompleted;
+            try
+            {
+                var reply = pingSender.Send(url, 5000, buffer, options);
+                
+                if (reply.Status == IPStatus.Success)
+                {
+                    response = int.Parse(reply.RoundtripTime.ToString());
+                }                
+            }
+            catch (Exception ex)
+            {                
+                //throw ;
+            }
 
-            ////// Create a buffer of 32 bytes of data to be transmitted.
-            ////string data = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-            ////byte[] buffer = Encoding.ASCII.GetBytes(data);
-
-            //// Set options for transmission:
-            //// The data can go through 64 gateways or routers
-            //// before it is destroyed, and the data packet
-            //// cannot be fragmented.
-            //PingOptions options = new PingOptions(64, true);
-
-            ////pingSender.SendAsync(url, 2, buffer, options);
-            //var reply = pingSender.Send(url);
-
-            //double response = 0;
-
-            //if (reply.Status == IPStatus.Success)
-            //{
-            //    response = double.Parse(reply.RoundtripTime.ToString());
-            //}
-
-            //return response;
+            return response;
+            
         }
 
         private void PingSender_PingCompleted(object sender, PingCompletedEventArgs e)
         {
             
-        }
-
-        private double GetAverageTimes(UrlResponseTimeModel responseTimes)
-        {
-            var averages = new List<double>
-                               {
-                                   responseTimes.ResponseTimesAmericas.Average(),
-                                   responseTimes.ResponseTimesEurope.Average(),
-                                   responseTimes.ResponseTimesAsia.Average()
-                               };
-            return averages.Average();
         }
     }
 }
