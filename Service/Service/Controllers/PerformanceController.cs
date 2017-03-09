@@ -1,11 +1,12 @@
 ﻿
-namespace Performance.Rest.Controllers
+namespace Service.Controllers
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Net.NetworkInformation;
     using System.Text;
+    using System.Threading;
     using System.Web.Http;
 
     using Newtonsoft.Json;
@@ -33,24 +34,24 @@ namespace Performance.Rest.Controllers
             return response;
         }
 
-        private UrlResponseTimeModel GetResponseTimes(UrlRequestModel request)
+        private List<int> GetResponseTimes(UrlRequestModel request)
         {
-            var response = new UrlResponseTimeModel();
+            //var response = new UrlResponseTimeModel();
 
-            response.Id = request.Id;
-            response.Name = request.Name;
-            response.Url = request.Url;
-            response.Repetition = request.Repetition;
+            //response.Id = request.Id;
+            //response.Name = request.Name;
+            //response.Url = request.Url;
+            //response.Repetition = request.Repetition;
 
-            response.ResponseTimes = new List<int>();
+            var response = new List<int>();
 
+            response = new List<int>();
+            
             for (int rep = 0; rep < request.Repetition; rep++)
             {
-                response.ResponseTimes.Add(this.GetResponseTimes(request.Url));                
+                response.Add(this.GetResponseTimes(request.Url));                
             }
-
-            response.ResponseTimeAverage = response.ResponseTimes.Average();
-
+            
             return response;
         }
 
@@ -72,6 +73,7 @@ namespace Performance.Rest.Controllers
 
             try
             {
+                
                 var reply = pingSender.Send(url, 5000, buffer, options);
                 
                 if (reply.Status == IPStatus.Success)
