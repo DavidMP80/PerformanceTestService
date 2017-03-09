@@ -45,13 +45,14 @@ namespace Service.Controllers
 
             var response = new List<int>();
 
-            response = new List<int>();
-            
-            for (int rep = 0; rep < request.Repetition; rep++)
+            if (request != null)
             {
-                response.Add(this.GetResponseTimes(request.Url));                
+                for (int rep = 0; rep < request.Repetition; rep++)
+                {
+                    response.Add(this.GetResponseTimes(request.Url));
+                }
             }
-            
+
             return response;
         }
 
