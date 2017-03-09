@@ -20,11 +20,6 @@
 
         public double ResponseTimeAverage { get; set; }
 
-        public ICollection<int> ResponseTimesAmericas { get; set; }
-
-        public ICollection<int> ResponseTimesEurope { get; set; }
-
-        public ICollection<int> ResponseTimesAsia { get; set; }
-
+        public ICollection<int> ResponseTimes { get; set; }
     }
 }
