@@ -41,9 +41,9 @@ namespace Performance.Rest.Controllers
             response.Url = request.Url;
             response.Repetition = request.Repetition;
 
-            response.ResponseTimesAmericas = new List<double>();
-            response.ResponseTimesEurope = new List<double>();
-            response.ResponseTimesAsia = new List<double>();
+            response.ResponseTimesAmericas = new List<int>();
+            response.ResponseTimesEurope = new List<int>();
+            response.ResponseTimesAsia = new List<int>();
 
             for (int rep = 0; rep < request.Repetition; rep++)
             {
@@ -57,9 +57,9 @@ namespace Performance.Rest.Controllers
             return response;
         }
 
-        private double GetResponseTimes(string url)
+        private int GetResponseTimes(string url)
         {
-            return new Random().NextDouble() * 10;
+            return new Random().Next() * 10;
 
             //var pingSender = new Ping();
 
